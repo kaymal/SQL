@@ -1,0 +1,41 @@
+---
+title: "SQL Queries with R Notebook"
+author: ["Kaymal"]
+output: html_notebook
+---
+
+```{bash}
+export PATH=/usr/local/mysql/bin:$PATH 
+mysql -u root -p
+```
+
+```{r}
+install.packages("RMySQL")
+library(RMySQL)
+library(DBI)
+```
+
+```{r}
+install.packages("RMariaDB")
+library(DBI)
+```
+
+```{r}
+con = dbConnect(RMySQL::MySQL(), dbname="sakila", user="root", password = "password!!", port=3306)
+```
+
+
+```{r}
+con <- dbConnect(RMariaDB::MariaDB(),
+      user = "root", password = "password!!", dbname = "sakila", port=3306)
+```
+
+
+```{sql, connection=con}
+SHOW TABLES
+```
+```{sql, connection=con, max.print = 20}
+SELECT COUNT(*)
+FROM film
+```
+
