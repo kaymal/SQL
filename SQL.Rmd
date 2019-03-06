@@ -1,33 +1,39 @@
 ---
 title: "SQL Queries with R Notebook"
-author: ["Kaymal"]
+author: "Kaymal"
 output: github_document
 ---
+# SQL Queries with R Notebook
 
-```{bash}
-export PATH=/usr/local/mysql/bin:$PATH 
-mysql -u root -p
-```
+Outline:
+- Installing Necessary Packages
+- Connection
+- Basic Queries
+  * 
+  *
 
-```{r}
-install.packages("RMySQL")
-library(RMySQL)
+## Installing Necessary Packages 
+
+```{r library}
+#install.packages("RMariaDB")
 library(DBI)
+library(RMariaDB)
+
+# Install config for credentials
+# install.packages("config")
 ```
 
-```{r}
-install.packages("RMariaDB")
-library(DBI)
-```
-
-```{r}
-con = dbConnect(RMySQL::MySQL(), dbname="sakila", user="root", password = "password!!", port=3306)
+## Connection
+```{r credentials}
+db <- config::get("DB")
 ```
 
 
-```{r}
+```{r connection}
 con <- dbConnect(RMariaDB::MariaDB(),
-      user = "root", password = "password!!", dbname = "sakila", port=3306)
+      user = db$user, password =db$password, dbname = "sakila", port=3306)
+
+rm(db)
 ```
 
 
@@ -38,4 +44,4 @@ SHOW TABLES
 SELECT COUNT(*)
 FROM film
 ```
-
+-
