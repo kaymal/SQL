@@ -2,13 +2,11 @@ SQL Queries with R Notebook
 ================
 Kaymal
 
-SQL Queries with R Notebook
-===========================
-
 Outline: 
 - Installing Necessary Packages 
-- Connection - Basic Queries
-  *
+- Connection and Credentials
+- Basic Queries
+  * 
   *
 
 Installing Necessary Packages
