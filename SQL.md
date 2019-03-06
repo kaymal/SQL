@@ -5,7 +5,11 @@ Kaymal
 SQL Queries with R Notebook
 ===========================
 
-Outline: - Installing Necessary Packages - Connection - Basic Queries \* \*
+Outline: 
+- Installing Necessary Packages 
+- Connection - Basic Queries
+  *
+  *
 
 Installing Necessary Packages
 -----------------------------
