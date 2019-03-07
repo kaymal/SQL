@@ -1,47 +1,117 @@
 ---
-title: "SQL Queries with R Notebook"
+title: 'SQL Intro: Querying Databases'
 author: "Kaymal"
-output: github_document
+output:
+  github_document: default
+  html_document: default
 ---
-# SQL Queries with R Notebook
+
+Structured Query Language (SQL) is a language for interacting with data stored in a _relational database_. The focus of this notebook is **querying databases**, yet one can also use SQL to modify a database or to create one. [Sakila](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=2ahUKEwipzNLVifHgAhURqaQKHXPWAfoQFjAAegQIBhAB&url=https%3A%2F%2Fdev.mysql.com%2Fdoc%2Fsakila%2Fen%2F&usg=AOvVaw2NuLo1XbYVnyU8rBTLsipX) Database is used in this study.
 
 Outline:
-- Installing Necessary Packages
-- Connection
-- Basic Queries
-  * 
-  *
+
+* Installing Necessary Packages
+* Connection and Credentials
+* Basic SQL Commands
+    + Selecting
+        - SELECT
+        - SELECT DISTINCT
+        - COUNT
+    + Filtering
+        - WHERE
+        - WHERE AND/OR
+        - BETWEEN
+        - WHERE IN
+        - NULL and ISNULL
+        - LIKE and NOT LIKE
+    + Aggregate Functions
+    + Sorting, Grouping, Merging
+        - ORDER BY
+        - GROUP BY
+        - HAVING
 
 ## Installing Necessary Packages 
 
-```{r library}
+```{r install packages}
+
 #install.packages("RMariaDB")
 library(DBI)
 library(RMariaDB)
+library(RMySQL)
 
+library(knitr)
+```
+```{r config, eval=FALSE}
 # Install config for credentials
 # install.packages("config")
+library(config)
 ```
 
-## Connection
+## Connection and Credentials
+
+For security reasons, it is always better not to write username or passwords in a Notebook. Creating a `config.yml` file and reading in the credentials from that is one option for security.
+
 ```{r credentials}
 db <- config::get("DB")
 ```
 
 
-```{r connection}
-con <- dbConnect(RMariaDB::MariaDB(),
-      user = db$user, password =db$password, dbname = "sakila", port=3306)
+```{r connect}
+# Initiate a connection with RMySQL
 
+con = dbConnect(RMySQL::MySQL(),
+      user = db$user, password = db$password, dbname = "sakila", port = 3306)
+
+# Alternatively, initiate a connection with RMariaDB
+#con = dbConnect(RMariaDB::MariaDB(),
+#      user = db$user, password =db$password, dbname = "sakila", port=3306)
+
+# Remove credentials
 rm(db)
 ```
 
+## Basic SQL Commands
+
+### SELECT
+
+We can select data **FROM** a table using the **SELECT** keyword.
 
 ```{sql, connection=con}
-SHOW TABLES
+SELECT 'First query'
+AS first_result;
 ```
-```{sql, connection=con, max.print = 20}
+
+
+```{sql, connection = con}
+-- Print tables of the 'sakila' Database
+SHOW TABLES;
+```
+
+```{sql, connection = con}
+-- Print the number of rows in the 'film' table
 SELECT COUNT(*)
-FROM film
+FROM film;
 ```
--
+
+```{sql, connection = con, max.print = 5}
+-- Select all columns from the 'film' table
+SELECT *
+FROM film;
+```
+
+```{sql, connection = con, max.print = 5}
+-- Select the 'title' column from the 'film' table
+SELECT title
+FROM film;
+```
+
+```{sql, connection = con, max.print = 5}
+-- Select the 'title' and 'release_year' columns from the 'film' table
+SELECT title, release_year
+FROM film;
+```
+
+```{r disconnect, eval=FALSE}
+# Disconnect
+dbDisconnect(con)
+```
