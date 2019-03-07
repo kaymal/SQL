@@ -1,13 +1,30 @@
-SQL Queries with R Notebook
+SQL Intro: Querying Databases
 ================
 Kaymal
 
-Outline: 
-- Installing Necessary Packages 
-- Connection and Credentials
-- Basic Queries
-  * 
-  *
+Structured Query Language (SQL) is a language for interacting with data stored in a *relational database*. The focus of this notebook is **querying databases**, yet one can also use SQL to modify a database or to create one. [Sakila](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=2ahUKEwipzNLVifHgAhURqaQKHXPWAfoQFjAAegQIBhAB&url=https%3A%2F%2Fdev.mysql.com%2Fdoc%2Fsakila%2Fen%2F&usg=AOvVaw2NuLo1XbYVnyU8rBTLsipX) Database is used in this study.
+
+Outline:
+
+-   Installing Necessary Packages
+-   Connection and Credentials
+-   Basic SQL Commands
+    -   Selecting
+        -   SELECT
+        -   SELECT DISTINCT
+        -   COUNT
+    -   Filtering
+        -   WHERE
+        -   WHERE AND/OR
+        -   BETWEEN
+        -   WHERE IN
+        -   NULL and ISNULL
+        -   LIKE and NOT LIKE
+    -   Aggregate Functions
+    -   Sorting, Grouping, Merging
+        -   ORDER BY
+        -   GROUP BY
+        -   HAVING
 
 Installing Necessary Packages
 -----------------------------
@@ -16,25 +33,59 @@ Installing Necessary Packages
 #install.packages("RMariaDB")
 library(DBI)
 library(RMariaDB)
+library(RMySQL)
 
-# Install config for credentials
-# install.packages("config")
+library(knitr)
 ```
 
-Connection
-----------
+``` r
+# Install config for credentials
+# install.packages("config")
+library(config)
+```
+
+Connection and Credentials
+--------------------------
+
+For security reasons, it is always better not to write username or passwords in a Notebook. Creating a `config.yml` file and reading in the credentials from that is one option for security.
 
 ``` r
 db <- config::get("DB")
 ```
 
 ``` r
-con <- dbConnect(RMariaDB::MariaDB(),
-      user = db$user, password =db$password, dbname = "sakila", port=3306)
+# Initiate a connection with RMySQL
+
+con = dbConnect(RMySQL::MySQL(),
+      user = db$user, password = db$password, dbname = "sakila", port = 3306)
+
+# Alternatively, initiate a connection with RMariaDB
+#con = dbConnect(RMariaDB::MariaDB(),
+#      user = db$user, password =db$password, dbname = "sakila", port=3306)
+
+# Remove credentials
+rm(db)
 ```
 
+Basic SQL Commands
+------------------
+
+### SELECT
+
+We can select data **FROM** a table using the **SELECT** keyword.
+
 ``` sql
-SHOW TABLES
+SELECT 'First query'
+AS first_result;
+```
+
+| first\_result |
+|:--------------|
+| First query   |
+
+``` sql
+-- Print tables of the 'sakila' Database
+SHOW TABLES;
 ```
 
 | Tables\_in\_sakila |
@@ -49,3 +100,60 @@ SHOW TABLES
 | customer\_list     |
 | film               |
 | film\_actor        |
+
+``` sql
+-- Print the number of rows in the 'film' table
+SELECT COUNT(*)
+FROM film;
+```
+
+| COUNT(\*) |
+|:----------|
+| 1000      |
+
+``` sql
+-- Select all columns from the 'film' table
+SELECT *
+FROM film;
+```
+
+| film\_id | title            | description                                                                                                           | release\_year |  language\_id|  original\_language\_id|  rental\_duration|  rental\_rate|  length|  replacement\_cost| rating | special\_features                | last\_update        |
+|:---------|:-----------------|:----------------------------------------------------------------------------------------------------------------------|:--------------|-------------:|-----------------------:|-----------------:|-------------:|-------:|------------------:|:-------|:---------------------------------|:--------------------|
+| 1        | ACADEMY DINOSAUR | A Epic Drama of a Feminist And a Mad Scientist who must Battle a Teacher in The Canadian Rockies                      | 2006          |             1|                      NA|                 6|          0.99|      86|              20.99| PG     | Deleted Scenes,Behind the Scenes | 2006-02-15 05:03:42 |
+| 2        | ACE GOLDFINGER   | A Astounding Epistle of a Database Administrator And a Explorer who must Find a Car in Ancient China                  | 2006          |             1|                      NA|                 3|          4.99|      48|              12.99| G      | Trailers,Deleted Scenes          | 2006-02-15 05:03:42 |
+| 3        | ADAPTATION HOLES | A Astounding Reflection of a Lumberjack And a Car who must Sink a Lumberjack in A Baloon Factory                      | 2006          |             1|                      NA|                 7|          2.99|      50|              18.99| NC-17  | Trailers,Deleted Scenes          | 2006-02-15 05:03:42 |
+| 4        | AFFAIR PREJUDICE | A Fanciful Documentary of a Frisbee And a Lumberjack who must Chase a Monkey in A Shark Tank                          | 2006          |             1|                      NA|                 5|          2.99|     117|              26.99| G      | Commentaries,Behind the Scenes   | 2006-02-15 05:03:42 |
+| 5        | AFRICAN EGG      | A Fast-Paced Documentary of a Pastry Chef And a Dentist who must Pursue a Forensic Psychologist in The Gulf of Mexico | 2006          |             1|                      NA|                 6|          2.99|     130|              22.99| G      | Deleted Scenes                   | 2006-02-15 05:03:42 |
+
+``` sql
+-- Select the 'title' column from the 'film' table
+SELECT title
+FROM film;
+```
+
+| title            |
+|:-----------------|
+| ACADEMY DINOSAUR |
+| ACE GOLDFINGER   |
+| ADAPTATION HOLES |
+| AFFAIR PREJUDICE |
+| AFRICAN EGG      |
+
+``` sql
+-- Select the 'title' and 'release_year' columns from the 'film' table
+SELECT title, release_year
+FROM film;
+```
+
+| title            | release\_year |
+|:-----------------|:--------------|
+| ACADEMY DINOSAUR | 2006          |
+| ACE GOLDFINGER   | 2006          |
+| ADAPTATION HOLES | 2006          |
+| AFFAIR PREJUDICE | 2006          |
+| AFRICAN EGG      | 2006          |
+
+``` r
+# Disconnect
+dbDisconnect(con)
+```
