@@ -2,8 +2,8 @@
 title: 'SQL Intro: Querying Databases'
 author: "Kaymal"
 output:
-  github_document: default
   html_document: default
+  github_document: default
 ---
 
 Structured Query Language (SQL) is a language for interacting with data stored in a _relational database_. The focus of this notebook is **querying databases**, yet one can also use SQL to modify a database or to create one. [Sakila](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=2ahUKEwipzNLVifHgAhURqaQKHXPWAfoQFjAAegQIBhAB&url=https%3A%2F%2Fdev.mysql.com%2Fdoc%2Fsakila%2Fen%2F&usg=AOvVaw2NuLo1XbYVnyU8rBTLsipX) Database is used in this study.
