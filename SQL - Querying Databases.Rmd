@@ -2,7 +2,6 @@
 title: 'SQL Intro: Querying Databases'
 author: "Kaymal"
 output:
-  html_document: default
   github_document: default
 ---
 
@@ -13,11 +12,13 @@ Outline:
 * Installing Necessary Packages
 * Connection and Credentials
 * Basic SQL Commands
-    + Selecting
+    + Viewing the Data
+    + Selecting Data
         - SELECT
         - SELECT DISTINCT
+        - LIMIT
         - COUNT
-    + Filtering
+    + Filtering Results
         - WHERE
         - WHERE AND/OR
         - BETWEEN
@@ -25,7 +26,7 @@ Outline:
         - NULL and ISNULL
         - LIKE and NOT LIKE
     + Aggregate Functions
-    + Sorting, Grouping, Merging
+    + Sorting, Grouping, Merging Data
         - ORDER BY
         - GROUP BY
         - HAVING
@@ -72,8 +73,16 @@ rm(db)
 
 ## Basic SQL Commands
 
-### SELECT
+### Viewing the Data
 
+```{sql, connection = con}
+-- Print names of the tables in the 'sakila' Database
+SHOW TABLES;
+```
+
+### Selecting Data
+
+#### SELECT
 We can select data **FROM** a table using the **SELECT** keyword.
 
 ```{sql, connection=con}
@@ -81,17 +90,6 @@ SELECT 'First query'
 AS first_result;
 ```
 
-
-```{sql, connection = con}
--- Print tables of the 'sakila' Database
-SHOW TABLES;
-```
-
-```{sql, connection = con}
--- Print the number of rows in the 'film' table
-SELECT COUNT(*)
-FROM film;
-```
 
 ```{sql, connection = con, max.print = 5}
 -- Select all columns from the 'film' table
@@ -111,6 +109,77 @@ SELECT title, release_year
 FROM film;
 ```
 
+#### DISTINCT
+
+When we want to return the unique values in a column, we use **DISTINCT** keyword.
+
+```{sql, connection = con, max.print = 5}
+-- Get different types of 'rating' values. 
+SELECT DISTINCT rating
+FROM film;
+```
+
+#### LIMIT
+
+We can use **LIMIT** to return a certain number of lines. 
+
+```{sql, connection = con, max.print = 5}
+-- Select all columns from the 'film' table. Limit the output with 2 results.
+SELECT *
+FROM film
+LIMIT 2;
+```
+
+#### COUNT
+
+```{sql, connection = con}
+-- Get the number of rows in the 'film' table
+SELECT COUNT(*)
+FROM film;
+```
+
+```{sql, connection = con}
+-- Print the number of distinct 'rating's in the 'film' table
+SELECT COUNT(DISTINCT rating)
+FROM film;
+```
+
+### Filtering Results
+
+#### WHERE
+
+**WHERE** is used to filter the results. We use comparison operators (`=`, `<=`, `<`, `<>`, etc.) along with WHERE. Note that we use `=` instead of `==`, and `<>` instead of `!=`.
+
+```{sql, connection = con, max.print = 5}
+-- Select all details for films which are released in 2006
+SELECT *
+FROM film
+WHERE release_year = 2006;
+```
+
+#### WHERE AND/OR
+
+```{sql, connection = con, max.print = 5}
+-- Select all details for films which are released in 2006 and have rating 'G'
+SELECT *
+FROM film
+WHERE release_year = 2006
+AND rating = 'G';
+```
+
+If we want to combine AND and OR, we need to use paranthesis.
+
+```{sql, connection = con, max.print = 5}
+-- Select all details for films which are released in 2006 and have rating 'G' or 'R'
+SELECT *
+FROM film
+WHERE release_year = 2006
+AND (rating = 'G' OR rating = 'R');
+```
+
+#### BETWEEN
+
+-----
 ```{r disconnect, eval=FALSE}
 # Disconnect
 dbDisconnect(con)
