@@ -12,7 +12,7 @@ Outline:
     -   Viewing the Data
     -   Selecting Data
         -   SELECT
-        -   SELECT DISTINCT
+        -   DISTINCT
         -   LIMIT
         -   COUNT
     -   Filtering Results
@@ -20,9 +20,12 @@ Outline:
         -   WHERE AND/OR
         -   BETWEEN
         -   WHERE IN
-        -   NULL and ISNULL
-        -   LIKE and NOT LIKE
+        -   IS NULL/IS NOT NULL
+        -   LIKE/NOT LIKE
     -   Aggregate Functions
+        -   COUNT
+        -   AVG, MAX, MIN, SUM
+        -   WHERE + Aggregate Function
     -   Sorting, Grouping, Merging Data
         -   ORDER BY
         -   GROUP BY
@@ -169,7 +172,7 @@ FROM film;
 
 #### LIMIT
 
-We can use **LIMIT** to return a certain number of lines.
+We can use `LIMIT` to return a certain number of lines.
 
 ``` sql
 -- Select all columns from the 'film' table. Limit the output with 2 results.
@@ -244,7 +247,7 @@ AND rating = 'G';
 |        11| ALAMO VIDEOTAPE   | A Boring Epistle of a Butler And a Cat who must Fight a Pastry Chef in A MySQL Convention                             | 2006          |             1|                      NA|                 6|          0.99|     126|              16.99| G      | Commentaries,Behind the Scenes | 2006-02-15 05:03:42 |
 |        22| AMISTAD MIDSUMMER | A Emotional Character Study of a Dentist And a Crocodile who must Meet a Sumo Wrestler in California                  | 2006          |             1|                      NA|                 6|          2.99|      85|              10.99| G      | Commentaries,Behind the Scenes | 2006-02-15 05:03:42 |
 
-If we want to combine AND and OR, we need to use paranthesis.
+If we want to combine `AND` and `OR`, we need to use paranthesis.
 
 ``` sql
 -- Select all details for films which are released in 2006 and have rating 'G' or 'R'
@@ -263,6 +266,114 @@ AND (rating = 'G' OR rating = 'R');
 |        11| ALAMO VIDEOTAPE  | A Boring Epistle of a Butler And a Cat who must Fight a Pastry Chef in A MySQL Convention                             | 2006          |             1|                      NA|                 6|          0.99|     126|              16.99| G      | Commentaries,Behind the Scenes | 2006-02-15 05:03:42 |
 
 #### BETWEEN
+
+``` sql
+-- Select all details from the 'table'sales_by_film_category' table where total sales are between 4500 and 5000.
+SELECT *
+FROM sales_by_film_category
+WHERE total_sales
+BETWEEN 4500 AND 5000;
+```
+
+| category  |  total\_sales|
+|:----------|-------------:|
+| Sci-Fi    |       4756.98|
+| Animation |       4656.30|
+| Drama     |       4587.39|
+
+#### WHERE IN
+
+When we need to filter based on multiple values, we can use `WHERE IN` instead of multiple `OR`s.
+
+``` sql
+-- Select all details from the 'table'sales_by_film_category' for the specified categories.
+SELECT *
+FROM sales_by_film_category
+WHERE category IN ('Animation', 'Action', 'Drama')
+```
+
+| category  |  total\_sales|
+|:----------|-------------:|
+| Animation |       4656.30|
+| Drama     |       4587.39|
+| Action    |       4375.85|
+
+#### IS NULL/IS NOT NULL
+
+`NULL` is particularly usefull when we want to learn whether there is a missing/unknown value in data.
+
+``` sql
+-- Select all details from the 'film_list' where 'category' is missing.
+SELECT *
+FROM film_list
+WHERE category IS NULL;
+```
+
+Table: 0 records
+
+FID title description category price length rating actors ---- ------ ------------ --------- ------ ------- ------- -------
+
+``` sql
+-- Count the number of missing values of the  'original_language_id' coulmn from the 'film' table.
+SELECT COUNT(*)
+FROM film
+WHERE original_language_id IS NULL;
+```
+
+| COUNT(\*) |
+|:----------|
+| 1000      |
+
+#### LIKE/ NOT LIKE
+
+We can use `LIKE` and `NOT LIKE` for filtering by a *pattern*. Wildcard `%` is used to match zero or more characters, while `_` is used to match a single character.
+
+``` sql
+-- Select title from film where title starts with MAT.
+SELECT title
+FROM film
+WHERE title LIKE 'MAT%';
+```
+
+| title          |
+|:---------------|
+| MATRIX SNOWMAN |
+
+``` sql
+-- Select title from film where title's second and third characters are A and T respectively.
+SELECT title
+FROM film
+WHERE title LIKE '_AT%';
+```
+
+| title              |
+|:-------------------|
+| CAT CONEHEADS      |
+| CATCH AMISTAD      |
+| DATE SPEED         |
+| FATAL HAUNTED      |
+| GATHERING CALENDAR |
+| HATE HANDICAP      |
+| MATRIX SNOWMAN     |
+| NATIONAL STORY     |
+| NATURAL STOCK      |
+| PATHS CONTROL      |
+
+### Agregate Functions
+
+#### COUNT
+
+#### AVG, MAX, MIN, SUM
+
+#### WHERE + Aggregate Function
+
+### Sorting, Grouping, Merging Data
+
+#### ORDER BY
+
+#### GROUP BY
+
+#### HAVING
 
 ------------------------------------------------------------------------
 
