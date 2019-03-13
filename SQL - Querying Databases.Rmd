@@ -15,7 +15,7 @@ Outline:
     + Viewing the Data
     + Selecting Data
         - SELECT
-        - SELECT DISTINCT
+        - DISTINCT
         - LIMIT
         - COUNT
     + Filtering Results
@@ -23,9 +23,12 @@ Outline:
         - WHERE AND/OR
         - BETWEEN
         - WHERE IN
-        - NULL and ISNULL
-        - LIKE and NOT LIKE
+        - IS NULL/IS NOT NULL
+        - LIKE/NOT LIKE
     + Aggregate Functions
+        - COUNT
+        - AVG, MAX, MIN, SUM
+        - WHERE + Aggregate Function
     + Sorting, Grouping, Merging Data
         - ORDER BY
         - GROUP BY
@@ -121,7 +124,7 @@ FROM film;
 
 #### LIMIT
 
-We can use **LIMIT** to return a certain number of lines. 
+We can use `LIMIT` to return a certain number of lines. 
 
 ```{sql, connection = con, max.print = 5}
 -- Select all columns from the 'film' table. Limit the output with 2 results.
@@ -167,7 +170,7 @@ WHERE release_year = 2006
 AND rating = 'G';
 ```
 
-If we want to combine AND and OR, we need to use paranthesis.
+If we want to combine `AND` and `OR`, we need to use paranthesis.
 
 ```{sql, connection = con, max.print = 5}
 -- Select all details for films which are released in 2006 and have rating 'G' or 'R'
@@ -179,6 +182,67 @@ AND (rating = 'G' OR rating = 'R');
 
 #### BETWEEN
 
+```{sql, connection = con}
+-- Select all details from the 'table'sales_by_film_category' table where total sales are between 4500 and 5000.
+SELECT *
+FROM sales_by_film_category
+WHERE total_sales
+BETWEEN 4500 AND 5000;
+```
+
+#### WHERE IN
+
+When we need to filter based on multiple values, we can use `WHERE IN` instead of multiple `OR`s.
+
+```{sql, connection = con}
+-- Select all details from the 'table'sales_by_film_category' for the specified categories.
+SELECT *
+FROM sales_by_film_category
+WHERE category IN ('Animation', 'Action', 'Drama')
+```
+
+#### IS NULL/IS NOT NULL
+
+`NULL` is particularly usefull when we want to learn whether there is a missing/unknown value in data.
+
+```{sql, connection = con}
+-- Select all details from the 'film_list' where 'category' is missing.
+SELECT *
+FROM film_list
+WHERE category IS NULL;
+```
+```{sql, connection = con}
+-- Count the number of missing values of the  'original_language_id' coulmn from the 'film' table.
+SELECT COUNT(*)
+FROM film
+WHERE original_language_id IS NULL;
+```
+
+#### LIKE/ NOT LIKE
+
+We can use `LIKE` and `NOT LIKE` for filtering by a _pattern_. Wildcard `%` is used to match zero or more characters, while `_` is used to match a single character.
+
+```{sql, connection = con}
+-- Select title from film where title starts with MAT.
+SELECT title
+FROM film
+WHERE title LIKE 'MAT%';
+```
+```{sql, connection = con}
+-- Select title from film where title's second and third characters are A and T respectively.
+SELECT title
+FROM film
+WHERE title LIKE '_AT%';
+```
+### Agregate Functions
+#### COUNT
+#### AVG, MAX, MIN, SUM
+#### WHERE + Aggregate Function
+
+### Sorting, Grouping, Merging Data
+#### ORDER BY
+#### GROUP BY
+#### HAVING
 -----
 ```{r disconnect, eval=FALSE}
 # Disconnect
