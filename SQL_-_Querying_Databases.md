@@ -25,8 +25,7 @@ Outline:
     -   Aggregate Functions
         -   COUNT
         -   AVG, MAX, MIN, SUM
-        -   WHERE + Aggregate Function
-    -   Sorting, Grouping, Merging Data
+    -   Sorting, Grouping, and Merging Data
         -   ORDER BY
         -   GROUP BY
         -   HAVING
@@ -271,8 +270,7 @@ AND (rating = 'G' OR rating = 'R');
 -- Select all details from the 'table'sales_by_film_category' table where total sales are between 4500 and 5000.
 SELECT *
 FROM sales_by_film_category
-WHERE total_sales
-BETWEEN 4500 AND 5000;
+WHERE total_sales BETWEEN 4500 AND 5000;
 ```
 
 | category  |  total\_sales|
@@ -289,7 +287,7 @@ When we need to filter based on multiple values, we can use `WHERE IN` instead o
 -- Select all details from the 'table'sales_by_film_category' for the specified categories.
 SELECT *
 FROM sales_by_film_category
-WHERE category IN ('Animation', 'Action', 'Drama')
+WHERE category IN ('Animation', 'Action', 'Drama');
 ```
 
 | category  |  total\_sales|
@@ -361,19 +359,123 @@ WHERE title LIKE '_AT%';
 
 ### Agregate Functions
 
+We can perform calculations in the data. The functions include `COUNT`, `AVG`, `MAX`, `MIN`, and `SUM`.
+
 #### COUNT
+
+``` sql
+-- Get the number of rows in the 'film' table (with aliasing)
+SELECT COUNT(*) AS Films_total
+FROM film;
+```
+
+| Films\_total |
+|:-------------|
+| 1000         |
 
 #### AVG, MAX, MIN, SUM
 
-#### WHERE + Aggregate Function
+``` sql
+-- Select average, max, min and sum of the replacement cost from the 'film' table
+SELECT AVG(replacement_cost), MAX(replacement_cost),
+      MIN(replacement_cost), SUM(replacement_cost)
+FROM film;
+```
+
+| AVG(replacement\_cost) |  MAX(replacement\_cost)|  MIN(replacement\_cost)|  SUM(replacement\_cost)|
+|:-----------------------|-----------------------:|-----------------------:|-----------------------:|
+| 19.984                 |                   29.99|                    9.99|                   19984|
 
 ### Sorting, Grouping, Merging Data
 
-#### ORDER BY
+It is possible to sort the results with `ORDER BY` in ascending or descending order. Default order is ascending. We use `DESC` for sorting in descending order.
+
+#### ORDER BY, DESC
+
+``` sql
+-- Select 'title' column from the 'film' table in ascending order.
+SELECT title
+FROM film
+WHERE title LIKE 'M%'
+ORDER BY title;
+```
+
+| title           |
+|:----------------|
+| MADIGAN DORADO  |
+| MADISON TRAP    |
+| MADNESS ATTACKS |
+| MADRE GABLES    |
+| MAGIC MALLRATS  |
+
+``` sql
+-- Select 'title' column from the 'film' table in descending order.
+SELECT title
+FROM film
+WHERE title LIKE 'M%'
+ORDER BY title DESC;
+```
+
+| title              |
+|:-------------------|
+| MYSTIC TRUMAN      |
+| MUSSOLINI SPOILERS |
+| MUSKETEERS WAIT    |
+| MUSIC BOONDOCK     |
+| MUSCLE BRIGHT      |
+
+``` sql
+-- Select 'title' column from the 'film' table. (Sort multiple columns)
+SELECT title, length
+FROM film
+WHERE title LIKE 'M%'
+ORDER BY length, title;
+```
+
+| title               |  length|
+|:--------------------|-------:|
+| MIDSUMMER GROUNDHOG |      48|
+| MUPPET MILE         |      50|
+| MAGNIFICENT CHITTY  |      53|
+| MOVIE SHAKESPEARE   |      53|
+| MATRIX SNOWMAN      |      56|
 
 #### GROUP BY
 
+``` sql
+-- Get the total number for each rating in the 'film' table (with aliasing) where the title starts with letter 'M'. Sort from highest to lowest.
+SELECT rating, COUNT(*) AS Rating_totals
+FROM film
+WHERE title LIKE 'M%'
+GROUP BY rating
+ORDER BY Rating_totals DESC;
+```
+
+| rating |  Rating\_totals|
+|:-------|---------------:|
+| PG     |              21|
+| PG-13  |              19|
+| G      |              14|
+| NC-17  |              10|
+| R      |               7|
+
 #### HAVING
+
+We cannot use aggregate functions with `WHERE`. `HAVING` clause is used for filtering with aggregate functions.
+
+``` sql
+-- Get the total number for each rating in the 'film' table (with aliasing) where rating total of the films starting with 'M' is higher than 15. Sort from highest to lowest.
+SELECT rating, COUNT(*) AS Rating_totals
+FROM film
+WHERE title LIKE 'M%'
+GROUP BY rating
+HAVING COUNT(rating)>15;
+```
+
+| rating |  Rating\_totals|
+|:-------|---------------:|
+| PG-13  |              19|
+| PG     |              21|
 
 ------------------------------------------------------------------------
 

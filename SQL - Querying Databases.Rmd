@@ -28,8 +28,7 @@ Outline:
     + Aggregate Functions
         - COUNT
         - AVG, MAX, MIN, SUM
-        - WHERE + Aggregate Function
-    + Sorting, Grouping, Merging Data
+    + Sorting, Grouping, and Merging Data
         - ORDER BY
         - GROUP BY
         - HAVING
@@ -186,8 +185,7 @@ AND (rating = 'G' OR rating = 'R');
 -- Select all details from the 'table'sales_by_film_category' table where total sales are between 4500 and 5000.
 SELECT *
 FROM sales_by_film_category
-WHERE total_sales
-BETWEEN 4500 AND 5000;
+WHERE total_sales BETWEEN 4500 AND 5000;
 ```
 
 #### WHERE IN
@@ -198,7 +196,7 @@ When we need to filter based on multiple values, we can use `WHERE IN` instead o
 -- Select all details from the 'table'sales_by_film_category' for the specified categories.
 SELECT *
 FROM sales_by_film_category
-WHERE category IN ('Animation', 'Action', 'Drama')
+WHERE category IN ('Animation', 'Action', 'Drama');
 ```
 
 #### IS NULL/IS NOT NULL
@@ -235,14 +233,80 @@ FROM film
 WHERE title LIKE '_AT%';
 ```
 ### Agregate Functions
+
+We can perform calculations in the data. The functions include `COUNT`, `AVG`, `MAX`, `MIN`, and `SUM`.
+
 #### COUNT
+
+```{sql, connection = con}
+-- Get the number of rows in the 'film' table (with aliasing)
+SELECT COUNT(*) AS Films_total
+FROM film;
+```
+
 #### AVG, MAX, MIN, SUM
-#### WHERE + Aggregate Function
+
+```{sql, connection = con, max.print = 5}
+-- Select average, max, min and sum of the replacement cost from the 'film' table
+SELECT AVG(replacement_cost), MAX(replacement_cost),
+      MIN(replacement_cost), SUM(replacement_cost)
+FROM film;
+```
 
 ### Sorting, Grouping, Merging Data
-#### ORDER BY
+
+It is possible to sort the results with `ORDER BY` in ascending or descending order. Default order is ascending. We use `DESC` for sorting in descending order.
+
+#### ORDER BY, DESC
+
+```{sql, connection = con, max.print = 5}
+-- Select 'title' column from the 'film' table in ascending order.
+SELECT title
+FROM film
+WHERE title LIKE 'M%'
+ORDER BY title;
+```
+
+```{sql, connection = con, max.print = 5}
+-- Select 'title' column from the 'film' table in descending order.
+SELECT title
+FROM film
+WHERE title LIKE 'M%'
+ORDER BY title DESC;
+```
+
+```{sql, connection = con, max.print = 5}
+-- Select 'title' column from the 'film' table. (Sort multiple columns)
+SELECT title, length
+FROM film
+WHERE title LIKE 'M%'
+ORDER BY length, title;
+```
+
 #### GROUP BY
+
+```{sql, connection = con}
+-- Get the total number for each rating in the 'film' table (with aliasing) where the title starts with letter 'M'. Sort from highest to lowest.
+SELECT rating, COUNT(*) AS Rating_totals
+FROM film
+WHERE title LIKE 'M%'
+GROUP BY rating
+ORDER BY Rating_totals DESC;
+```
+
 #### HAVING
+
+We cannot use aggregate functions with `WHERE`. `HAVING` clause is used for filtering with aggregate functions.
+
+```{sql, connection = con}
+-- Get the total number for each rating in the 'film' table (with aliasing) where rating total of the films starting with 'M' is higher than 15. Sort from highest to lowest.
+SELECT rating, COUNT(*) AS Rating_totals
+FROM film
+WHERE title LIKE 'M%'
+GROUP BY rating
+HAVING COUNT(rating)>15;
+```
+
 -----
 ```{r disconnect, eval=FALSE}
 # Disconnect
