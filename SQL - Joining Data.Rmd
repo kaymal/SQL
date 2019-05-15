@@ -1,0 +1,214 @@
+---
+title: 'SQL: Joining Data'
+author: "Kaymal"
+output:
+  github_document: default
+---
+
+Outline:
+
+* Intro
+* INNER JOIN
+    + USING
+    + Self-Join
+    + CASE, WHEN, THEN, ELSE, and END
+    + INTO
+* Outer JOIN
+    + LEFT JOIN
+    + RIGHT JOIN
+    + FULL JOIN
+    + CROSS JOIN
+* Set Theory
+    + UNION
+    + UNION ALL
+    + INTERSECT
+    + EXCEPT
+* Subqueries (Nested Queries)
+    + Inside SELECT
+    + Inside WHERE **
+    + Inside FROM
+
+## Introduction
+```{r connect}
+# Install the package in R
+#install.packages("RPostgreSQL")
+library(RPostgreSQL)
+## Loading required package: DBI
+pgdrv <- dbDriver(drvName = "PostgreSQL")
+
+con <-DBI::dbConnect(pgdrv,
+                    dbname="template1",
+                    host="localhost", port=5432,
+                    user = rstudioapi::askForPassword("Database username"),
+                    password = rstudioapi::askForPassword("Database password"))
+
+```
+
+## INNER JOIN
+
+```{sql, connection=con}
+SELECT * 
+FROM cities
+```
+```{sql, connection=con, max.print = 5}
+SELECT COUNT(*) 
+FROM cities
+```
+```{sql, connection=con}
+SELECT * 
+FROM countries
+```
+
+```{sql, connection=con}
+SELECT cities.name AS city, countries.name AS country, countries.region 
+FROM cities
+  -- Inner join to countries
+  INNER JOIN countries
+    -- Match on the country codes
+    ON cities.country_code = countries.code;
+```
+
+Get data from both the countries and economies tables to examine the inflation rate for both 2010 and 2015.
+
+```{sql, connection=con, max.print = 5}
+-- Select fields with aliases
+SELECT c.code AS country_code, c.name, year, inflation_rate
+FROM countries AS c
+  -- Join to economies (alias e)
+  INNER JOIN economies AS e
+    -- Match on code
+    ON c.code = e.code;
+```
+
+Get the country name, its region, and the fertility rate for both 2010 and 2015 for each country.
+
+```{sql, connection=con, max.print = 5}
+-- Select fields
+SELECT c.code, c.name, c.region, p.year, fertility_rate
+  -- 1. From countries (alias as c)
+  FROM countries AS c
+  -- 2. Join with populations (as p)
+  INNER JOIN populations AS p
+    -- 3. Match on country code
+    ON c.code = p.country_code
+```
+
+```{sql, connection=con, max.print = 5}
+-- Select fields
+SELECT c.code, name, region, e.year, fertility_rate, unemployment_rate
+  -- From countries (alias as c)
+  FROM countries AS c
+  -- Join to populations (as p)
+  INNER JOIN populations AS p
+    -- Match on country code
+    ON c.code = p.country_code
+  -- Join to economies (as e)
+  INNER JOIN economies AS e
+    -- Match on country code and year
+    ON c.code = e.code AND e.year = p.year;
+```
+
+### USING
+
+```{sql, connection=con, max.print = 5}
+SELECT c.name AS country, continent, l.name AS language, official
+  -- From countries (alias as c)
+  FROM countries AS c
+  -- Join to languages (as l)
+  INNER JOIN languages AS l
+    -- Match using code
+    USING(code)
+```
+
+### Self-Join
+
+Use the populations table to perform a self-join to calculate the percentage increase in population from 2010 to 2015 for each country code:
+```{sql, connection=con, max.print = 5}
+SELECT p1.country_code,
+       p1.size AS size2010, 
+       p2.size AS size2015,
+       -- calculate growth_perc
+       ((p2.size - p1.size)/p1.size * 100.0) AS growth_perc
+-- From populations (alias as p1)
+FROM populations AS p1
+  -- Join to itself (alias as p2)
+  INNER JOIN populations AS p2
+    -- Match on country code
+    ON p1.country_code = p2.country_code
+        -- and year (with calculation)
+        AND p1.year = p2.year - 5
+```
+### CASE, WHEN, THEN, ELSE, and END
+
+Create a new field _geosize_group_ that groups the countries into three groups: large, medium and small.
+```{sql, connection=con, max.print = 5}
+SELECT name, continent, code, surface_area,
+    -- First case
+    CASE WHEN surface_area > 2000000 THEN 'large'
+        -- Second case
+        WHEN surface_area > 350000 THEN 'medium'
+        -- Else clause + end
+        ELSE 'small' END
+        -- Alias name
+        AS geosize_group
+-- From table
+FROM countries;
+```
+### INTO
+Create _countries plus_ table:
+```{sql, connection=con, max.print = 5}
+/*
+SELECT name, continent, code, surface_area,
+    CASE WHEN surface_area > 2000000
+            THEN 'large'
+       WHEN surface_area > 350000
+            THEN 'medium'
+       ELSE 'small' END
+       AS geosize_group
+INTO countries_plus
+FROM countries;
+*/
+```
+
+Explore the relationship between the size of a country in terms of surface area and in terms of population using grouping fields created with CASE:
+
+```{sql, connection=con, max.print = 5}
+/*
+SELECT country_code, size,
+  CASE WHEN size > 50000000
+            THEN 'large'
+       WHEN size > 1000000
+            THEN 'medium'
+       ELSE 'small' END
+       AS popsize_group
+INTO pop_plus       
+FROM populations
+WHERE year = 2015;
+*/
+
+-- Select fields
+SELECT name, continent, geosize_group, popsize_group
+-- From countries_plus (alias as c)
+FROM countries_plus AS c
+  -- Join to pop_plus (alias as p)
+  INNER JOIN pop_plus AS p
+    -- Match on country code
+    ON c.code = p.country_code
+-- Order the table    
+ORDER BY geosize_group;
+```
+
+## Outer JOIN
+```{sql, connection=con, max.print = 5}
+
+```
+
+## Set Theory
+```{sql, connection=con, max.print = 5}
+
+```
+
+## Subqueries
+```{sql, connection=con, max.print = 5}
+
+```
